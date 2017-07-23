@@ -255,7 +255,7 @@ if( version_compare( get_option( 'ninja_forms_version', '0.0.0' ), '3', '<' ) ||
 
               $client_id = Ninja_Forms()->get_setting('drip_client_id');
 
-              if( ! empty( $client_id ) && ! empty( $drip_secret ) && count( $client_id ) === 64 && count(  Ninja_Forms()->get_setting('drip_client_secret') ) === 64 ){
+              if( count( $client_id ) === 64 && count( $drip_secret ) === 64 ){
 
                 wp_redirect( add_query_arg( array(
                   'response_type' => 'code',
