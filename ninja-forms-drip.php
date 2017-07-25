@@ -92,9 +92,10 @@ if( version_compare( get_option( 'ninja_forms_version', '0.0.0' ), '3', '<' ) ||
             add_filter( 'ninja_forms_plugin_settings', array( $this, 'plugin_settings' ), 10, 1 );
             add_filter( 'ninja_forms_plugin_settings_groups', array( $this, 'plugin_settings_groups' ), 10, 1 );
 
+            add_filter( 'query_vars', array( $this, 'add_query_vars' ), 0 );
+            add_filter( 'parse_request', array( $this, 'parse_request' ), 0 );
             add_action( 'init', array( $this, 'custom_rewrite_basic' ) );
-            add_filter( 'query_vars', array( $this, 'add_query_vars' ) );
-            add_filter( 'parse_request', array( $this, 'parse_request' ), 100 );
+
 
             add_action( 'ninja_forms_save_setting_drip_secret',   array( $this, 'save_drip_secret' ), 10, 1 );
 
@@ -140,7 +141,7 @@ if( version_compare( get_option( 'ninja_forms_version', '0.0.0' ), '3', '<' ) ||
 
         function custom_rewrite_basic()
         {
-          add_rewrite_rule('^ninja-forms-drip-authorize/', 'index.php?ninja_forms_drip_authorize=true', 'top');
+          add_rewrite_rule('^ninja-forms-drip-authorize/', 'index.php?ninja-forms-drip-authorize=true', 'top');
         }
 
         function parse_request()
@@ -148,7 +149,7 @@ if( version_compare( get_option( 'ninja_forms_version', '0.0.0' ), '3', '<' ) ||
           global $wp_query;
           if( ! is_user_logged_in() )
           if( ! isset( $wp_query->query['ninja-forms-drip-authorize'] ) ) return;
-          if( isset( $_GET['code'] ) ) do_action( 'admin_post_ninja_forms_drip_authorize' );
+          if( isset( $wp_query->query['ninja-forms-drip-authorize'] ) && isset( $_GET['code'] ) ) do_action( 'admin_post_ninja_forms_drip_authorize' );
         }
 
         function add_query_vars($vars){
@@ -249,13 +250,14 @@ if( version_compare( get_option( 'ninja_forms_version', '0.0.0' ), '3', '<' ) ||
 
         public function save_drip_secret( $drip_secret )
         {
+
             $token = Ninja_Forms()->get_setting('drip_token');
 
             if( empty( $token ) ){
 
               $client_id = Ninja_Forms()->get_setting('drip_client_id');
 
-              if( count( $client_id ) === 64 && count( $drip_secret ) === 64 ){
+              if( strlen( $client_id ) === 64 && strlen( $drip_secret ) === 64 ){
 
                 wp_redirect( add_query_arg( array(
                   'response_type' => 'code',
