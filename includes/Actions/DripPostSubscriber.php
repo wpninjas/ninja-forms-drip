@@ -18,7 +18,7 @@ final class NF_Drip_Actions_DripPostSubscriber extends NF_Abstracts_Action
     /**
      * @var string
      */
-    protected $_timing = 'normal';
+    protected $_timing = 'late';
 
     /**
      * @var int
@@ -158,10 +158,10 @@ final class NF_Drip_Actions_DripPostSubscriber extends NF_Abstracts_Action
         foreach( $user_custom_fields as $key => $pair ){
           $pair = trim( $pair );
           if( ! empty( $pair ) ){
-            $field = explode( ':', $pair );
+            $field = explode( '=>', $pair );
             if( ! empty( $field ) && is_array( $field ) ){
               if( isset( $field[0] ) && isset( $field[1] ) && ! empty( $field[0] ) && ! empty( $field[1] ) ){
-                $custom_fields[ sanitize_key( trim($field[0]) ) ] = sanitize_text_field( trim( $field[1] ) );
+                $custom_fields[ str_replace( '-', '_', sanitize_key( trim($field[0]) ) ) ] = esc_html( trim( $field[1] ) );
               }
             }
           }
@@ -193,8 +193,6 @@ final class NF_Drip_Actions_DripPostSubscriber extends NF_Abstracts_Action
       if( intval( $action_settings['drip_base_lead_score'] ) !== 30 ){
         $subscriber['base_lead_score'] = intval( $action_settings['drip_base_lead_score'] );
       }
-
-      error_log(print_r($subscriber, true));
 
       $response  = NF_Drip()->remote_post(
         "http://api.getdrip.com/v2/{:account_id}/subscribers", array( 'subscribers' => array( $subscriber )

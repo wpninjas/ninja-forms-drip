@@ -246,7 +246,7 @@ if( version_compare( get_option( 'ninja_forms_version', '0.0.0' ), '3', '<' ) ||
 
         public static function get_drip_redirect_url()
         {
-          return esc_url_raw( site_url('/ninja-forms-drip-authorize/' ) );
+          return esc_url_raw( home_url('/ninja-forms-drip-authorize/' ) );
         }
 
         public function save_drip_secret( $drip_secret )
